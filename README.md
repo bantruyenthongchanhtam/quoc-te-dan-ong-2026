@@ -19,7 +19,8 @@ Một "tập phim" hoạt hình 7 cảnh với 4 nhân vật SVG tự dựng kh�
 - **Huy Lê (Cậu Út)** – nhảy ra từ bụi cây, hỏi quà 19/11
 
 Kèm nhạc nền & hiệu ứng âm thanh **tổng hợp trực tiếp bằng Web Audio API**
-(không cần file mp3), hộp thoại gõ chữ, camera zoom/pan, pháo giấy và nhiều hiệu ứng khác.
+(không cần file mp3); âm thanh được khởi động/khôi phục khi người dùng tương tác và khi quay lại tab,
+hỗ trợ Safari trên iPhone. Ngoài ra còn có hộp thoại gõ chữ, camera zoom/pan, pháo giấy và nhiều hiệu ứng khác.
 
 ## 🛠 Kỹ thuật
 

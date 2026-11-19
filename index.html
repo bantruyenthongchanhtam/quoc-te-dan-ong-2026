@@ -1439,24 +1439,32 @@
           const AudioCtx = window.AudioContext || window.webkitAudioContext;
           if (AudioCtx) this.ctx = new AudioCtx();
         }
-        if (this.ctx && this.ctx.state === 'suspended') {
-          this.ctx.resume();
+        if (this.ctx && this.ctx.state !== 'running' && this.ctx.state !== 'closed') {
+          this.ctx.resume().catch(error => {
+            console.warn('Không thể tiếp tục phát âm thanh:', error);
+          });
         }
       }
 
       setMuted(mute) {
         this.muted = mute;
+        if (!mute) this.init();
         if (this.bgmAudioEl) {
           this.bgmAudioEl.muted = mute;
         }
       }
 
       setPaused(paused) {
-        if (!this.bgmAudioEl) return;
         if (paused) {
-          this.bgmAudioEl.pause();
-        } else if (!this.muted) {
-          this.bgmAudioEl.play().catch(() => {});
+          if (this.bgmAudioEl) this.bgmAudioEl.pause();
+          return;
+        }
+
+        this.init();
+        if (this.bgmAudioEl && !this.muted) {
+          this.bgmAudioEl.play().catch(error => {
+            console.warn('Không thể tiếp tục phát nhạc nền:', error);
+          });
         }
       }
 
@@ -1531,6 +1539,7 @@
 
       // Nhạc nền tự động lấy từ danh sách SCENE_BGM_PLAYLIST theo từng cảnh
       startBGM(trackKey = 'scene1') {
+        this.init();
         if (this.currentTrack === trackKey && (this.bgmTimer || this.bgmAudioEl)) return;
         this.stopBGM();
         this.currentTrack = trackKey;
@@ -1545,7 +1554,9 @@
           audio.volume = 0.45;
           audio.muted = this.muted;
           if (!window.__isPaused) {
-            audio.play().catch(() => {});
+            audio.play().catch(error => {
+              console.warn('Không thể phát nhạc nền:', error);
+            });
           }
           this.bgmAudioEl = audio;
           return;
@@ -2192,6 +2203,9 @@
 
       bindEvents() {
         window.addEventListener('resize', () => this.resizeStage());
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden && !this.isPaused) this.sound.init();
+        });
 
         document.getElementById('btn-start-movie').addEventListener('click', () => {
           this.sound.init();
