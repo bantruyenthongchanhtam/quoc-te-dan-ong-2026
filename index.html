@@ -1435,6 +1435,12 @@
       }
 
       init() {
+        // 1. Cho phép phát âm thanh ngay cả khi iPhone đang bật chế độ im lặng (iOS 17+)
+        if (navigator.audioSession) {
+          try {
+            navigator.audioSession.type = 'playback';
+          } catch (e) {}
+        }
         if (!this.ctx) {
           const AudioCtx = window.AudioContext || window.webkitAudioContext;
           if (AudioCtx) this.ctx = new AudioCtx();
@@ -1443,6 +1449,17 @@
           this.ctx.resume().catch(error => {
             console.warn('Không thể tiếp tục phát âm thanh:', error);
           });
+        }
+        // 2. Mở khóa phần cứng âm thanh trên Safari bằng 1 buffer im lặng
+        if (this.ctx && !this.unlocked) {
+          try {
+            const buffer = this.ctx.createBuffer(1, 1, 22050);
+            const source = this.ctx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(this.ctx.destination);
+            source.start(0);
+            this.unlocked = true;
+          } catch (e) {}
         }
       }
 
@@ -1470,6 +1487,9 @@
 
       playTone(freq, duration = 0.2, type = 'sine', volume = 0.08, slideTo = null) {
         if (this.muted || !this.ctx) return;
+        if (this.ctx.state === 'suspended' || this.ctx.state === 'interrupted') {
+          this.ctx.resume().catch(() => {});
+        }
         try {
           const now = this.ctx.currentTime;
           const osc = this.ctx.createOscillator();
@@ -2238,6 +2258,15 @@
           this.sound.setMuted(!this.sound.muted);
           btnMute.innerHTML = this.sound.muted ? '🔇 <span class="lbl">Đã tắt</span>' : '🔊 <span class="lbl">Âm thanh</span>';
         });
+
+                // Thêm vào trong bindEvents()
+        const unlockOnce = () => {
+          this.sound.init();
+          document.removeEventListener('touchstart', unlockOnce);
+          document.removeEventListener('pointerdown', unlockOnce);
+        };
+        document.addEventListener('touchstart', unlockOnce, { passive: true });
+        document.addEventListener('pointerdown', unlockOnce, { passive: true });
       }
 
       // Scale sân khấu 1200x675 khít hoàn hảo mọi màn hình điện thoại / tablet / desktop
