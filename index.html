@@ -2,12 +2,22 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>19/11 – Hôm Nay Các Anh Là Nhân Vật Chính! | Chánh Tâm – Phước Duyên</title>
-  <!-- Font chuẩn tiếng Việt (Be Vietnam Pro thiết kế riêng cho dấu tiếng Việt + Nunito bo tròn hoạt hình) -->
+  <meta name="description" content="Phim hoạt hình ngắn chúc mừng Ngày Quốc tế Nam giới 19/11, tặng anh em Học Chúng Chánh Tâm – Tự viện Phước Duyên: hài hước, ấm áp và đầy yêu thương." />
+  <!-- Open Graph: hiện card đẹp khi chia sẻ link qua Zalo / Facebook / Messenger -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="19/11 – Hôm Nay Các Anh Là Nhân Vật Chính!" />
+  <meta property="og:description" content="Phim hoạt hình ngắn tặng anh em Chánh Tâm – Phước Duyên nhân Ngày Quốc tế Nam giới 19/11." />
+  <meta property="og:url" content="https://bantruyenthongchanhtam.github.io/quoc-te-dan-ong-2026/" />
+  <meta property="og:locale" content="vi_VN" />
+  <!-- Favicon logo Chánh Tâm (bản rút gọn 64px từ assets/favicon.png gốc) + icon màn hình chính iOS -->
+  <link rel="icon" type="image/png" sizes="64x64" href="assets/favicon-64.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
+  <!-- Font chuẩn tiếng Việt (Be Vietnam Pro thiết kế riêng cho dấu tiếng Việt). Chỉ tải 4 mức weight thực tế dùng (600–900) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700;800;900&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     /* ==========================================================================
@@ -16,16 +26,6 @@
     :root {
       --font-display: 'Be Vietnam Pro', 'Nunito', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
       --font-body: 'Be Vietnam Pro', 'Nunito', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
-      --bg-cinema: #151926;
-      --lam-primary: #7d8da6;
-      --lam-dark: #5f6f89;
-      --lam-light: #9aa9c1;
-      --skin: #ffe0c2;
-      --skin-shadow: #f3c49d;
-      --accent-gold: #ffbe3b;
-      --accent-coral: #ff6b6b;
-      --accent-teal: #2ec4b6;
-      --text-dark: #232946;
     }
 
     * {
@@ -53,7 +53,8 @@
     #cinema-wrapper {
       position: relative;
       width: 100vw;
-      height: 100vh;
+      height: 100vh; /* fallback cho trình duyệt cũ */
+      height: 100dvh; /* tránh nhảy khung khi thanh địa chỉ Safari mobile ẩn/hiện */
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -398,13 +399,6 @@
     #dialogue-text {
       color: #232946;
       font-family: var(--font-body);
-      font-size: 25px;
-      font-weight: 700;
-      line-height: 1.48;
-      margin-top: 8px;
-    }
-    #dialogue-text {
-      color: #232946;
       font-size: 27px;
       font-weight: 800;
       line-height: 1.38;
@@ -689,16 +683,16 @@
        MODULE 2: ANIMATION.CSS - HỆ THỐNG CHUYỂN ĐỘNG NHÂN VẬT & MÔI TRƯỜNG
        ========================================================================== */
 
-    /* Nhân vật gốc */
+    /* Nhân vật gốc — đặt vị trí bằng translate3d thay vì left/bottom
+       để chuyển động chạy trên compositor, không gây layout/paint lại mỗi khung hình */
     .char-actor {
       position: absolute;
-      bottom: 85px;
+      bottom: 0;
       left: 0;
       width: 240px;
       height: 330px;
-      transform-origin: bottom center;
-      transition: left 1s ease, bottom 0.6s ease, opacity 0.4s ease;
-      will-change: transform, left, bottom;
+      transition: opacity 0.4s ease;
+      will-change: transform;
     }
     .char-flip {
       width: 100%;
@@ -862,11 +856,10 @@
       animation: shockJolt 0.35s ease-out forwards;
     }
 
-    /* Người dẫn chuyện (Thầy Nhật Đạo) */
+    /* Người dẫn chuyện (Thầy Nhật Đạo) — vị trí do transform của .char-actor điều khiển */
     #char-narrator {
       width: 200px;
       height: 255px;
-      bottom: 215px;
       z-index: 32;
     }
     #char-narrator .narrator-float {
@@ -1067,6 +1060,16 @@
       0% { transform: translateY(0) rotate(0deg); opacity: 1; }
       85% { opacity: 1; }
       100% { transform: translateY(760px) rotate(540deg); opacity: 0; }
+    }
+
+    /* Tôn trọng người dùng bật "Giảm chuyển động" trong hệ điều hành:
+       tắt các hiệu ứng môi trường lặp vô hạn, giữ nguyên diễn xuất chính của phim */
+    @media (prefers-reduced-motion: reduce) {
+      .sun-rays, .sun-core, .cloud, .bird, .butterfly, .temple-smoke,
+      .sway-tree, .sway-bush, .lotus-bob, .montage-burst,
+      .intro-pill, .btn-play-main {
+        animation: none !important;
+      }
     }
   </style>
 </head>
@@ -1944,6 +1947,7 @@
       constructor(id) {
         this.el = document.getElementById(id);
         this.emoEl = document.getElementById(`${id}-emo`);
+        this.bottom = 85; // khoảng cách hiện tại từ mép dưới stage (px)
         this.states = [
           'state-idle', 'state-walk', 'state-run', 'state-slide',
           'state-jump', 'state-laugh', 'state-wave', 'state-mic',
@@ -1956,12 +1960,14 @@
         this.el.style.opacity = visible ? '1' : '0';
       }
 
+      // Đặt vị trí bằng translate3d: (left, bottom) là tọa độ theo hệ stage 1200x675
       setPos(left, bottom = null, durationMs = 0) {
+        if (bottom !== null) this.bottom = bottom;
+        const move = `translate3d(${left}px, ${-this.bottom}px, 0)`;
         this.el.style.transition = durationMs > 0
-          ? `left ${durationMs}ms cubic-bezier(0.35, 0.8, 0.4, 1), bottom ${durationMs}ms ease, opacity 0.4s ease`
+          ? `transform ${durationMs}ms cubic-bezier(0.35, 0.8, 0.4, 1), opacity 0.4s ease`
           : 'opacity 0.4s ease';
-        this.el.style.left = `${left}px`;
-        if (bottom !== null) this.el.style.bottom = `${bottom}px`;
+        this.el.style.transform = move;
       }
 
       moveTo(left, durationMs = 900, bottom = null) {
@@ -2233,25 +2239,29 @@
         this.stage.style.transform = `scale(${scale})`;
       }
 
-      // Hàm chờ có hỗ trợ Tạm dừng & Hủy khi Xem lại
+      // Hàm chờ theo requestAnimationFrame: chính xác theo ms, hỗ trợ Tạm dừng & Hủy khi Xem lại
       wait(ms, runId) {
         return new Promise((resolve, reject) => {
           let elapsed = 0;
-          const step = 40;
-          const timer = setInterval(() => {
+          let last = performance.now();
+          const tick = (now) => {
             if (runId !== this.runId) {
-              clearInterval(timer);
               reject(new Error('RESTARTED'));
               return;
             }
+            // Chặn bước nhảy lớn khi tab bị ẩn rồi quay lại
+            const dt = Math.min(now - last, 100);
+            last = now;
             if (!this.isPaused) {
-              elapsed += step;
+              elapsed += dt;
               if (elapsed >= ms) {
-                clearInterval(timer);
                 resolve();
+                return;
               }
             }
-          }, step);
+            requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
         });
       }
 
@@ -2284,12 +2294,36 @@
 
         if (actor) actor.setTalking(true);
 
-        for (let i = 0; i < text.length; i++) {
-          if (runId !== this.runId) throw new Error('RESTARTED');
-          this.dialogueText.textContent += text[i];
-          if (i % 4 === 0) this.sound.playTone(340 + (i % 5) * 45, 0.03, 'sine', 0.015);
-          await this.wait(28, runId);
-        }
+        // Hiệu ứng gõ chữ theo thời gian thực: đúng 1 ký tự / 28ms bất kể tốc độ khung hình
+        const chars = Array.from(text); // duyệt theo code point để không vỡ ký tự đặc biệt/emoji
+        await new Promise((resolve, reject) => {
+          let i = 0;
+          let acc = 0;
+          let last = performance.now();
+          const tick = (now) => {
+            if (runId !== this.runId) {
+              reject(new Error('RESTARTED'));
+              return;
+            }
+            const dt = Math.min(now - last, 100);
+            last = now;
+            if (!this.isPaused) {
+              acc += dt;
+              while (i < chars.length && acc >= 28) {
+                acc -= 28;
+                this.dialogueText.textContent += chars[i];
+                if (i % 4 === 0) this.sound.playTone(340 + (i % 5) * 45, 0.03, 'sine', 0.015);
+                i++;
+              }
+              if (i >= chars.length) {
+                resolve();
+                return;
+              }
+            }
+            requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        });
 
         if (actor) actor.setTalking(false);
         await this.wait(holdMs, runId);
@@ -2331,6 +2365,23 @@
           el.style.animationDelay = `${Math.random() * 1.4}s`;
           this.fxLayer.appendChild(el);
           setTimeout(() => el.remove(), 5500);
+        }
+      }
+
+      // Mưa lấp lánh rơi quanh một vùng sân khấu (dùng cho khoảnh khắc trao quà Cảnh 7)
+      spawnSparkles(leftPx, widthPx, count = 16) {
+        const items = ['✨', '⭐', '🌟'];
+        for (let i = 0; i < count; i++) {
+          const el = document.createElement('div');
+          el.className = 'fx-particle';
+          el.textContent = items[i % items.length];
+          el.style.left = `${leftPx + Math.random() * widthPx}px`;
+          el.style.top = `${170 + Math.random() * 130}px`;
+          el.style.fontSize = `${16 + Math.random() * 18}px`;
+          el.style.animationDuration = `${1.2 + Math.random() * 1.2}s`;
+          el.style.animationDelay = `${Math.random() * 0.7}s`;
+          this.fxLayer.appendChild(el);
+          setTimeout(() => el.remove(), 3600);
         }
       }
 
@@ -2869,18 +2920,16 @@
             this.cauUt, 450, runId
           );
 
-          // Tbh và Minh Ý quay trở lại
-          this.tung.face('right');
-          this.anhCa.face('right');
+          // Tbh và Minh Ý quay trở lại — Tbh dừng xa bên trái, Minh Ý đứng sát cạnh Huy Lê
           this.tung.setPos(1240, 88, 0);
           this.anhCa.setPos(1300, 88, 0);
           this.tung.face('left');
           this.anhCa.face('left');
           this.tung.setState('walk');
           this.anhCa.setState('walk');
-          this.tung.moveTo(460, 750);
-          this.anhCa.moveTo(220, 850);
-          await this.wait(850, runId);
+          this.tung.moveTo(120, 1100);
+          this.anhCa.moveTo(540, 850);
+          await this.wait(1150, runId);
           this.tung.face('right');
           this.anhCa.face('right');
           this.tung.setState('idle');
@@ -2892,7 +2941,8 @@
             this.tung, 500, runId
           );
 
-          this.setCamera(1.24, -120, -22, 0.55);
+          // Cận cảnh cặp đôi Minh Ý – Huy Lê đứng cạnh nhau, Tbh ở xa ngoài khung hình
+          this.setCamera(1.28, -160, -22, 0.7);
           this.cauUt.setExpr('smirk');
           await this.say(
             'Huy Lê', '#ff6b6b',
@@ -2900,24 +2950,27 @@
             this.cauUt, 650, runId
           );
 
-          // Minh Ý thản nhiên tiến lại đưa cho Huy Lê cây chổi và khăn lau bàn
-          this.setCamera(1.04, 0, 0, 0.5);
+          // Minh Ý trao "món quà": chỉ tay, biểu tượng quà và mưa lấp lánh quanh hai người
           this.anhCa.clearProps();
-          this.anhCa.setState('walk');
-          this.anhCa.moveTo(560, 750);
-          await this.wait(760, runId);
-          this.anhCa.setState('idle');
+          this.sound.sfx('chime');
+          this.anhCa.setState('point');
+          this.anhCa.showEmo('🎁', 1600);
+          this.spawnSparkles(540, 420, 16);
+          await this.wait(750, runId);
 
-          this.sound.sfx('shock');
+          // Huy Lê giật mình nhận chổi + khăn lau bàn
+          this.sound.sfx('pop');
           this.cauUt.setProp('broom', true);
           this.cauUt.setProp('cloth', true);
           this.cauUt.setState('shock');
           this.cauUt.setExpr('surprise');
           this.cauUt.showEmo('😱', 1800);
           this.shakeCamera(true);
-          await this.freezeFrame(950, runId);
+          this.sound.sfx('shock');
+          await this.freezeFrame(1000, runId);
 
-          // Tbh ôm bụng cười
+          // Kéo máy rộng: Tbh ôm bụng cười một mình ở góc xa
+          this.setCamera(1.0, 0, 0, 0.6);
           this.tung.setState('laugh');
           this.sound.sfx('laugh');
           this.tung.showEmo('🤣', 2200);
